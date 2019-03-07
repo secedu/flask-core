@@ -8,11 +8,13 @@ from .core import (
     models as core_models,
 )
 
+
 def create_app(config=None):
     """
     Creates an Flask application instance.
 
-    Optionally takes in a configuration object OR fully-qualified object path.
+    Optionally takes in a configuration object OR fully-qualified object path. Config may also be provided through
+    a pyfile pointed by FLASK_CORE_CONFIG envvar.
 
     If DB_CONNECTION_STRING is provided, a SQLAlchemy object will be instantiated and available at app.db
 
@@ -23,6 +25,9 @@ def create_app(config=None):
 
     if config:
         app.config.from_object(config)
+
+    # Attempt to load config from pyfile as well, if it exists
+    app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
 
     if "DB_CONNECTION_STRING" in app.config:
         # setup our database connection
