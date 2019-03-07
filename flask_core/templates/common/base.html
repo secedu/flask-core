@@ -50,7 +50,7 @@
           </div>
         </nav>
 
-    <div class="container">
+    <div class="container{% if fluid is defined %}-fluid{% endif %}">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
