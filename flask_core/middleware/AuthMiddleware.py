@@ -27,7 +27,6 @@ class AuthMiddleware(object):
         except StopIteration:
             return self._require_auth(environ, start_response)
 
-        print(self.app.active_sessions)
         if zid not in self.app.active_sessions or self.app.active_sessions[zid] != token:
             return self._require_auth(environ, start_response)
 
