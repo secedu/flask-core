@@ -8,6 +8,8 @@ from .core import (
     models as core_models,
 )
 
+from .middleware.AuthMiddleware import AuthMiddleware
+
 
 def create_app(config=None):
     """
@@ -34,6 +36,9 @@ def create_app(config=None):
         app.db = create_engine(app.config["DB_CONNECTION_STRING"])
 
     app.register_blueprint(core_bp)
+
+    # Authentication middleware
+    app.wsgi_app = AuthMiddleware(app.wsgi_app)
 
     # TODO: insert logging middleware
 

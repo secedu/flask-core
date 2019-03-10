@@ -30,6 +30,11 @@ class Config(object):
         self.SECRET_KEY = secrets.token_bytes(16)
         self.DEBUG = bool(os.environ.get("DEBUG", False))
 
+        # CSE auth verification stuff
+        self.CSE_AUTH_ENDPOINT = "http://cgi.cse.unsw.edu.au/~cs6443/auth/"
+        self.CSE_AUTH_PUBKEY = \
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMPXnWOREIV3X6mkPLLn5xjYZxMT/Nld2owilXuc3n6E assertion_pkey_100319"
+
         # Use any user provided config opts
         for k, v in kwargs.items():
             setattr(self, k, v)
