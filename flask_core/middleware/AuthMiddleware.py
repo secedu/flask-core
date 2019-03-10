@@ -36,8 +36,10 @@ class AuthMiddleware(object):
         pass
 
     def _require_auth(self, environ, start_response):
-        start_response(
-            "302 Temporary Redirect", [("Location", f"{self.cse_endpoint}?t=http://{environ['HTTP_HOST']}/core/cse")]
+        server_name = (
+            environ["HTTP_X_FORWARDED_SERVER"] if "HTTP_X_FORWARDED_SERVER" in environ else environ["HTTP_HOST"]
         )
+
+        start_response("302 Temporary Redirect", [("Location", f"{self.cse_endpoint}?t=http://{server_name}/core/cse")])
 
         return [b"Authentication required, redirecting.."]
