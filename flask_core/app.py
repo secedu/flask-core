@@ -3,10 +3,7 @@
 from flask import Flask
 from sqlalchemy import create_engine
 
-from .core import (
-    bp as core_bp,
-    models as core_models,
-)
+from .core import bp as core_bp, models as core_models
 
 from .middleware.AuthMiddleware import AuthMiddleware
 
@@ -36,6 +33,9 @@ def create_app(config=None):
         app.db = create_engine(app.config["DB_CONNECTION_STRING"])
 
     app.register_blueprint(core_bp)
+
+    # Add a map of token -> zid
+    app.active_sessions = {}
 
     # Authentication middleware
     app.wsgi_app = AuthMiddleware(app.wsgi_app)

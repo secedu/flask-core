@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-from setuptools import (
-    setup,
-    find_packages,
-)
+from setuptools import setup, find_packages
 
 setup(
     name="flask-core",
@@ -12,15 +9,6 @@ setup(
     author_email="cs6443@cse.unsw.edu.au",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        "flask",
-        "psycopg2",
-        "psycopg2-binary",
-        "SQLAlchemy",
-    ],
-    package_data={
-        "flask-core": [
-            "templates/*/*",
-        ]
-    },
+    install_requires=["flask", "psycopg2", "psycopg2-binary", "SQLAlchemy", "cryptography"],
+    package_data={"flask-core": ["templates/*/*"]},
 )
