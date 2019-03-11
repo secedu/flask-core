@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 
 from .core import bp as core_bp, models as core_models
 
-from .middleware.AuthMiddleware import AuthMiddleware
+from .middleware.handler import Handler
 
 
 def create_app(config=None):
@@ -38,7 +38,7 @@ def create_app(config=None):
     app.active_sessions = {}
 
     # Authentication middleware
-    app.wsgi_app = AuthMiddleware(app.wsgi_app)
+    app.wsgi_app = Handler(app.wsgi_app)
 
     # TODO: insert logging middleware
 
