@@ -15,7 +15,7 @@ class AuthMiddleware(object):
             return self._require_auth(environ, start_response)
 
         if environ["PATH_INFO"] == "/core/cse":
-            return self.wsgi_app(environ, start_response)
+            return None
 
         # Verify that the cookies are valid
         cookie_store = SimpleCookie()
@@ -30,7 +30,7 @@ class AuthMiddleware(object):
         if zid not in self.app.active_sessions or self.app.active_sessions[zid] != token:
             return self._require_auth(environ, start_response)
 
-        return self.wsgi_app(environ, start_response)
+        return None
 
     def _check_assertion(self, cookie):
         pass
