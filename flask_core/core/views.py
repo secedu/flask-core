@@ -25,23 +25,13 @@ from flask import (
 )
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 
-
-@app.before_request
-def check_core_auth():
-    if request.endpoint != "handle_cse":
-        return
-
-    if "CORE_TOKEN" not in current_app.config or "TOKEN" not in request.cookies:
-        return "This subdirectory is not in scope.", 400
-
-    if current_app.config["CORE_TOKEN"] != request.cookies["TOKEN"]:
-        return "This subdirectory is not in scope.", 403
-
-
 @app.route("/")
 def home():
     return "Flask Core - Common routes"
 
+@app.route("/nuke_db")
+def nuke_db():
+    #TODO: this
 
 @app.route("/cse")
 def handle_cse():
@@ -80,7 +70,36 @@ def handle_cse():
     )
     user_token = secrets.token_hex(32)
 
-    current_app.active_sessions[zid] = user_token
+
+
+    # 0. Set up and early exit
+    config = current_app.config["DB_CONFIG"]
+    zid_db_name = f"{zid}_{config["BASE"]}"
+    if config["MODE"] == "GLOBAL":
+        current_app.db = current_app.global_db
+    else:
+        # 1. check if zid exists db 
+        res = current_app.db.execute("SELECT * FROM information_schema.tables WHERE table_name=%s",(zid_db_name,)).first()
+        if res is None:
+            create_user_db(zid)
+        # 2. connect to db as zid
+    
+
+    if config["DB_MODE"] == "STUDENT_ISOLATED":
+        passwd = secrets.token_hex(16)
+        session.db_name = f"{zid}_{config["BASE"]}"
+        db_config = current_app.config["DB_CONFIG"]
+        current_app.db.execute("CREATE USER %s WITH PASSWORD %s",(zid,passwd,))
+        current_app.db.execute(f"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA {session.db_name} TO {zid}")
+        current_app.db.execute(f"CREATE DATABASE {session.db_name} WITH TEMPLATE {db_config["DB_BASE"]} OWNER {zid}")
+        session.db = create_engine(f"{db_config["DB_PROTOCOL"]}://{zid}:{passwd}@{db_config["DB_HOST"]}/{session.db_name}")
+    else:
+        session.db = current_app.global_db
+    
+    if zid in current_app.active_sessions:
+        current_app.active_sessions[zid].kill()
+    
+    current_app.active_sessions[zid] = session
 
     resp.set_cookie("zid", zid)
     resp.set_cookie("token", user_token)

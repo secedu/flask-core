@@ -4,6 +4,7 @@ import os
 import secrets
 import logging
 import textwrap
+from urllib.parse import urlparse 
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +56,23 @@ VQIDAQAB
         try:
             self.FLAG = getattr(self, "FLAG", None) or os.environ["FLAG"]
             self.FLAG_SECRET = getattr(self, "FLAG_SECRET", None) or os.environ["FLAG_SECRET"]
-            self.DB_CONNECTION_STRING = (
-                getattr(self, "DB_CONNECTION_STRING", None) or os.environ["DB_CONNECTION_STRING"]
-            )
+            url = getattr(self, "DB_CONNECTION_URL", None) or os.environ["DB_CONNECTION_URL"]
+            parsed = urlparse(url)
+            self.DB_CONFIG = {
+                "HOST": parsed.hostname,
+                "DIALECT": parsed.scheme,
+                "ROOT_USERNAME": parsed.username,
+                "ROOT_PASSWORD": parsed.password,
+                "SCHEMA_FILE": getattr(self, "DB_SCHEMA_FILE", None) or os.environ["DB_SCHEMA_FILE"],
+                "MODE": getattr(self, "DB_MODE", None) or os.environ["DB_MODE"],
+                "BASE": parsed.path[1:]
+            }
+
+            # check DB_MODE
+            if self.DB_CONFIG["MODE"] in ["GLOBAL", "STUDENT_ISOLATED"]:
+                raise RuntimeError(f"Required config option DB_MODE must be either GLOBAL or STUDENT_ISOLATED")
+            # read schema
+            with open(self.DB_CONFIG["SCHEMA_FILE"],"r") as f:
+                self.DB_CONFIG["SCHEMA"] = f.read()
         except KeyError as e:
             raise RuntimeError(f"Required config option {e} not set and not provided from environment.")
