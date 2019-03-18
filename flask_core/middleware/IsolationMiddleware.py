@@ -21,6 +21,10 @@ class IsolationMiddleware(object):
         except ModuleNotFoundError:
             self.app.logger.error(f"Couldn't import database isolation adapter {type}.{type.title()}")
 
+        self.app.config["FLASK_CORE_ISOLATION_ENABLED"] = self.isolation_lib and self.isolation_tables
+
+        self.app.logger.info("Database isolation %s", self.app.config["FLASK_CORE_ISOLATION_ENABLED"])
+
     def __call__(self, environ, start_response):
         """
         Handles instantiation of the isolation strategy. Delegates isolation to configured isolation library as defined
@@ -30,12 +34,12 @@ class IsolationMiddleware(object):
         :param start_response:
         :return:
         """
-        if not self.isolation_lib or not self.isolation_tables:
+        if not self.app.config["FLASK_CORE_ISOLATION_ENABLED"]:
             return None
 
         zid = self.app.config["AUTH_CHECKER"].check_auth(environ)
         if not zid:
-            raise RuntimeError("No zID available for DB isolation.")
+            raise RuntimeError("No zID provided by auth for DB isolation.")
 
         self.isolation_lib.init_isolation(zid, self.isolation_tables)
 

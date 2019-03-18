@@ -37,15 +37,19 @@ def _isolate(self, app, ns=None):
     conn = self.connect()
     db_type = get_database_type(app.config["DB_CONNECTION_STRING"])
 
-    try:
-        ns = ns or g.zid
-    except AttributeError:
-        app.logger.error(f"Application couldn't acquire zID and no namespace was provided.")
-    else:
-        if db_type == "postgres":
-            conn.execute(f"SET search_path TO '{ns}'")
+    if app.config["FLASK_CORE_ISOLATION_ENABLED"]:
+        try:
+            ns = ns or g.zid
+
+            if not ns:
+                raise AttributeError
+        except AttributeError:
+            app.logger.error(f"Application couldn't acquire zID and no namespace was provided.")
         else:
-            app.logger.warn(f"DB isolation not available on this database type {db_type}")
+            if db_type == "postgres":
+                conn.execute(f"SET search_path TO '{ns}'")
+            else:
+                app.logger.warn(f"DB isolation not available on this database type {db_type}")
 
     yield conn
 
