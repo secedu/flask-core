@@ -80,7 +80,7 @@ def handle_cse():
     )
     user_token = secrets.token_hex(32)
 
-    current_app.active_sessions[zid] = user_token
+    current_app.config["AUTH_CHECKER"].do_auth(zid=zid, token=user_token)
 
     resp.set_cookie("zid", zid)
     resp.set_cookie("token", user_token)

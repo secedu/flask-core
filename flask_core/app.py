@@ -28,18 +28,14 @@ def create_app(config=None):
     # Attempt to load config from pyfile as well, if it exists
     app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
 
+    # setup our database connection
     if "DB_CONNECTION_STRING" in app.config:
-        # setup our database connection
         app.db = create_engine(app.config["DB_CONNECTION_STRING"])
 
+    # Register core blueprints
     app.register_blueprint(core_bp)
 
-    # Add a map of token -> zid
-    app.active_sessions = {}
-
-    # Authentication middleware
+    # Register all our middleware
     app.wsgi_app = Handler(app.wsgi_app)
-
-    # TODO: insert logging middleware
 
     return app
