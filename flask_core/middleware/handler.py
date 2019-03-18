@@ -15,6 +15,14 @@ class Handler(object):
         ]
 
     def __call__(self, environ, start_response):
+        """
+        Cycles through all our middleware and calls them in order.
+
+        :param environ:
+        :param start_response:
+        :return: Middleware response if any, else wsgi_app response
+        """
+
         # Bypass all middleware for /core/cse
         if environ["PATH_INFO"] == "/core/cse":
             return self.wsgi_app(environ, start_response)

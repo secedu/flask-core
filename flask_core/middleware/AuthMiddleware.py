@@ -29,6 +29,16 @@ class AuthMiddleware(object):
         return None
 
     def _require_auth(self, environ, start_response):
+        """
+        Redirects the user to the authentication endpoint.
+
+        TODO: make the redirect adaptable? Authcloak may also depreciate this.. this shouldn't be here since it's
+        strictly CSE only
+
+        :param environ:
+        :param start_response:
+        :return:
+        """
         server_name = (
             environ["HTTP_X_FORWARDED_SERVER"] if "HTTP_X_FORWARDED_SERVER" in environ else environ["HTTP_HOST"]
         )

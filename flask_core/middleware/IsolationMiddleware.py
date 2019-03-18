@@ -22,6 +22,14 @@ class IsolationMiddleware(object):
             self.app.logger.error(f"Couldn't import database isolation adapter {type}.{type.title()}")
 
     def __call__(self, environ, start_response):
+        """
+        Handles instantiation of the isolation strategy. Delegates isolation to configured isolation library as defined
+        above.
+
+        :param environ:
+        :param start_response:
+        :return:
+        """
         if not self.isolation_lib or not self.isolation_tables:
             return None
 

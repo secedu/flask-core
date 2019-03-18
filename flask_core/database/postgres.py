@@ -5,6 +5,14 @@ from .database import Database
 
 class Postgres(Database):
     def init_isolation(self, schema_name, tables):
+        """
+        Creates a new schema with passed in tables and copies data from the public schema.
+
+        :param schema_name: Schema name
+        :param tables: Tables to copy from public schema
+        :return: None
+        """
+
         # Check if the isolation already exists
         rv = self.app.db.execute(
             f"SELECT COUNT(schema_name) FROM information_schema.schemata WHERE schema_name='{schema_name}'"
