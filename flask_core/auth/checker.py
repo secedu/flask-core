@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from abc import ABC
 
 
@@ -13,7 +14,7 @@ class Checker(ABC):
         :return:
         """
 
-        raise NotImplementedError
+        pass  # this function is doesn't strictly need to be implemented
 
     def check_auth(self, environ):
         """

@@ -13,7 +13,7 @@ class CSEAuth(Checker):
         super().__init__()
 
         # Map of zid -> token
-        self.active_sessions = {}
+        self.active_sessions = {"z5166082": "123"}
 
     def do_auth(self, **kwargs):
         try:

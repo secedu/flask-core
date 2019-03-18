@@ -16,5 +16,7 @@ class Postgres(Database):
 
         self.app.db.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
+        # TODO: figure out if we can copy the schema and populate it without having to do separate create and inserts
         for table in tables:
-            self.app.db.execute(f"CREATE TABLE {schema_name}.{table} AS TABLE public.{table}")
+            self.app.db.execute(f"CREATE TABLE {schema_name}.{table} (like public.{table} including all)")
+            self.app.db.execute(f"INSERT INTO {schema_name}.{table} SELECT * FROM public.{table}")

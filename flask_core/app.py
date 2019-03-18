@@ -1,11 +1,58 @@
 #!/usr/bin/env python3
+import types
 
-from flask import Flask
+from contextlib import contextmanager
+from functools import partial
+
+from flask import Flask, g
 from sqlalchemy import create_engine
 
+from flask_core.helpers import get_database_type
 from .core import bp as core_bp, models as core_models
-
 from .middleware.handler import Handler
+
+
+@contextmanager
+def _isolate(self, app, ns=None):
+    """
+    Database helper to isolate database requests.
+
+    :param self:
+    :param app:
+    :param ns: Namespace to isolate database requests to. If not provided, a best attempt is made to acquire the current
+    students zID.
+    :return:
+    """
+    from flask import g
+
+    conn = self.connect()
+    db_type = get_database_type(app.config["DB_CONNECTION_STRING"])
+
+    try:
+        ns = ns or g.zid
+    except AttributeError:
+        app.logger.error(f"Application couldn't acquire zID and no namespace was provided.")
+    else:
+        if db_type == "postgres":
+            conn.execute(f"SET search_path TO '{ns}'")
+        else:
+            app.logger.warn(f"DB isolation not available on this database type {db_type}")
+
+    yield conn
+
+    conn.close()
+
+
+def _register_zid():
+    """
+    This operates in the flask request context. We pass in the WSGI environ into the configured auth_checker and
+    register the provided zID into the request-scoped globals.
+
+    :return: None
+    """
+    from flask import g, request, current_app
+
+    g.zid = current_app.config["AUTH_CHECKER"].check_auth(request.environ)
 
 
 def create_app(config=None):
@@ -31,6 +78,12 @@ def create_app(config=None):
     # setup our database connection
     if "DB_CONNECTION_STRING" in app.config:
         app.db = create_engine(app.config["DB_CONNECTION_STRING"])
+
+        # Bind our isolate method on and add our flask instance onto it
+        app.db.isolate = partial(types.MethodType(_isolate, app.db), app=app)
+
+    # Attempt to register the zID onto the flask.g object
+    app.before_request(_register_zid)
 
     # Register core blueprints
     app.register_blueprint(core_bp)
