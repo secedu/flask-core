@@ -17,6 +17,15 @@ def _isolate(self, app, ns=None):
     """
     Database helper to isolate database requests.
 
+    To isolate database requests, wrap your statement like so:
+
+    ```python3
+    with app.db.isolate() as conn:
+        conn.execute('...')  # isolated to zid schemata
+
+    app.db.execute('...')  # NOT isolated to zid schemata
+    ```
+
     :param self:
     :param app:
     :param ns: Namespace to isolate database requests to. If not provided, a best attempt is made to acquire the current
