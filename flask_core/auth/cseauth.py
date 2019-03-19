@@ -27,9 +27,10 @@ class CSEAuth(Checker):
     def check_auth(self, environ):
         # Verify that the cookies are valid
         cookie_store = SimpleCookie()
+
         try:
             cookie_store.load(environ["HTTP_COOKIE"])
-        except:
+        except KeyError:  # No cookies = no auth so just fail fast
             return None
 
         try:
