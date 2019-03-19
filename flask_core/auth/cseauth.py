@@ -27,7 +27,10 @@ class CSEAuth(Checker):
     def check_auth(self, environ):
         # Verify that the cookies are valid
         cookie_store = SimpleCookie()
-        cookie_store.load(environ["HTTP_COOKIE"])
+        try:
+            cookie_store.load(environ["HTTP_COOKIE"])
+        except:
+            return None
 
         try:
             zid = next((i for i in cookie_store.items() if i[0] == "zid"))[1].value
