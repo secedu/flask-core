@@ -26,18 +26,6 @@ from flask import (
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 
 
-@app.before_request
-def check_core_auth():
-    if request.endpoint != "handle_cse":
-        return
-
-    if "CORE_TOKEN" not in current_app.config or "TOKEN" not in request.cookies:
-        return "This subdirectory is not in scope.", 400
-
-    if current_app.config["CORE_TOKEN"] != request.cookies["TOKEN"]:
-        return "This subdirectory is not in scope.", 403
-
-
 @app.route("/")
 def home():
     return "Flask Core - Common routes"
@@ -80,7 +68,7 @@ def handle_cse():
     )
     user_token = secrets.token_hex(32)
 
-    current_app.active_sessions[zid] = user_token
+    current_app.config["AUTH_CHECKER"].do_auth(zid=zid, token=user_token)
 
     resp.set_cookie("zid", zid)
     resp.set_cookie("token", user_token)

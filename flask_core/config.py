@@ -5,6 +5,8 @@ import secrets
 import logging
 import textwrap
 
+from flask_core.auth.cseauth import CSEAuth
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,6 +32,9 @@ class Config(object):
         self.NAVBAR = []
         self.SECRET_KEY = secrets.token_bytes(16)
         self.DEBUG = bool(os.environ.get("DEBUG", False))
+
+        # Make the auth checker pluggable - default to cse for now
+        self.AUTH_CHECKER = CSEAuth()
 
         # CSE auth verification stuff
         self.CSE_AUTH_ENDPOINT = "http://cgi.cse.unsw.edu.au/~cs6443/auth/"
