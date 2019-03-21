@@ -90,7 +90,7 @@ def create_app(config=None):
 
     # setup our database connection
     if "DB_CONNECTION_STRING" in app.config:
-        app.db = create_engine(app.config["DB_CONNECTION_STRING"])
+        app.db = create_engine(app.config["DB_CONNECTION_STRING"], pool_pre_ping=app.config.get("DB_AUTO_RECONNECT", True))
 
         # Bind our isolate method on and add our flask instance onto it
         app.db.isolate = partial(types.MethodType(_isolate, app.db), app=app)
