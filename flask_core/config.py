@@ -6,6 +6,7 @@ import logging
 import textwrap
 
 from flask_core.auth.cseauth import CSEAuth
+from distutils.util import strtobool
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +34,8 @@ class Config(object):
         self.SECRET_KEY = secrets.token_bytes(16)
         self.DEBUG = bool(os.environ.get("DEBUG", False))
 
-        self.ENABLE_AUTH = bool(os.environ.get("FLASK_CORE_ENABLE_AUTH", True))
-        self.ENABLE_ISOLATION = bool(os.environ.get("FLASK_CORE_ENABLE_ISOLATION", True))
+        self.ENABLE_AUTH = strtobool(os.environ.get("FLASK_CORE_ENABLE_AUTH", "True"))
+        self.ENABLE_ISOLATION = strtobool(os.environ.get("FLASK_CORE_ENABLE_ISOLATION", "True"))
 
         self.ISOLATION_TABLES = [t for t in os.environ.get("FLASK_CORE_ISOLATE_TABLES", "").split(",") if t.strip()]
 
