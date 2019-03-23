@@ -3,16 +3,17 @@
 from .AuthMiddleware import AuthMiddleware
 from .FilterMiddleware import FilterMiddleware
 from .IsolationMiddleware import IsolationMiddleware
-
+import os 
 
 class Handler(object):
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
         self.middleware = [
             FilterMiddleware(self.wsgi_app),
-            AuthMiddleware(self.wsgi_app),
-            IsolationMiddleware(self.wsgi_app),
+            IsolationMiddleware(self.wsgi_app)
         ]
+        if not bool(os.environ.get("DISABLE_AUTH", False)):
+            self.middleware.append(AuthMiddleware(self.wsgi_app))
 
     def __call__(self, environ, start_response):
         """
