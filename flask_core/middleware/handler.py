@@ -9,12 +9,12 @@ class Handler(object):
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
         self.middleware = [
-            FilterMiddleware(self.wsgi_app),
-            IsolationMiddleware(self.wsgi_app)
+            FilterMiddleware(self.wsgi_app)
         ]
         if not bool(os.environ.get("DISABLE_AUTH", False)):
+            self.middleware.append(IsolationMiddleware(self.wsgi_app))
             self.middleware.append(AuthMiddleware(self.wsgi_app))
-
+            
     def __call__(self, environ, start_response):
         """
         Cycles through all our middleware and calls them in order.
