@@ -8,6 +8,10 @@ class AuthMiddleware(object):
         self.cse_endpoint = self.app.config["CSE_AUTH_ENDPOINT"]
         self.assertion_pub_key = self.app.config["CSE_AUTH_PUBKEY"]
 
+        # Register the zID into the session when
+        if self.app.config["ENABLE_AUTH"]:
+            self.app.before_request(self._register_zid)
+
     def __call__(self, environ, start_response):
         """
         Enforces authentication for all requests hitting this flask application.
@@ -16,14 +20,10 @@ class AuthMiddleware(object):
         :param start_response:
         :return:
         """
-
-        if environ["PATH_INFO"] != "/core/cse" and "HTTP_COOKIE" not in environ:
-            return self._require_auth(environ, start_response)
-
-        if environ["PATH_INFO"] == "/core/cse":
+        if not self.app.config["ENABLE_AUTH"] or environ["PATH_INFO"] == "/core/cse":
             return None
 
-        if not self.app.config["AUTH_CHECKER"].check_auth(environ):
+        if "HTTP_COOKIE" not in environ or not self.app.config["AUTH_CHECKER"].check_auth(environ):
             return self._require_auth(environ, start_response)
 
         return None
@@ -46,3 +46,15 @@ class AuthMiddleware(object):
         start_response("302 Temporary Redirect", [("Location", f"{self.cse_endpoint}?t=http://{server_name}/core/cse")])
 
         return [b"Authentication required, redirecting.."]
+
+    @staticmethod
+    def _register_zid():
+        """
+        This operates in the flask request context. We pass in the WSGI environ into the configured auth_checker and
+        register the provided zID into the request-scoped globals.
+
+        :return: None
+        """
+        from flask import g, request, current_app
+
+        g.zid = current_app.config["AUTH_CHECKER"].check_auth(request.environ)
