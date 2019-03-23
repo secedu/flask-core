@@ -25,7 +25,7 @@ class IsolationMiddleware(object):
             self.app.logger.error(f"Couldn't import database isolation adapter {type}.{type.title()}")
 
         self.app.config["ISOLATION_ENABLED"] = (
-            self.app.config["ISOLATION_ENABLED"] and self.isolation_lib and self.isolation_tables
+            self.app.config["ENABLE_ISOLATION"] and self.isolation_lib and self.isolation_tables
         )
 
         self.app.logger.info("Database isolation %s", self.app.config["ISOLATION_ENABLED"])
