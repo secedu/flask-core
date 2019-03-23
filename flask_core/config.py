@@ -33,8 +33,14 @@ class Config(object):
         self.SECRET_KEY = secrets.token_bytes(16)
         self.DEBUG = bool(os.environ.get("DEBUG", False))
 
-        self.DISABLE_AUTH = bool(os.environ.get("DISABLE_AUTH", False))
+        self.FLASK_CORE_ENABLE_AUTH = True
+        if os.environ.get("FLASK_CORE_ENABLE_AUTH", "").lower() == 'false':
+            self.FLASK_CORE_ENABLE_AUTH = False
 
+        if not self.FLASK_CORE_ENABLE_AUTH:
+            logger.error("Auth disabled, auto disabling database isolation")
+            self.FLASK_CORE_ISOLATION_ENABLED = False
+        
         # Make the auth checker pluggable - default to cse for now
         self.AUTH_CHECKER = CSEAuth()
 
