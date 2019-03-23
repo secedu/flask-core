@@ -8,6 +8,9 @@ class AuthMiddleware(object):
         self.cse_endpoint = self.app.config["CSE_AUTH_ENDPOINT"]
         self.assertion_pub_key = self.app.config["CSE_AUTH_PUBKEY"]
 
+        # Register the zID into the session when
+        self.app.before_request(self._register_zid)
+
     def __call__(self, environ, start_response):
         """
         Enforces authentication for all requests hitting this flask application.
@@ -46,3 +49,16 @@ class AuthMiddleware(object):
         start_response("302 Temporary Redirect", [("Location", f"{self.cse_endpoint}?t=http://{server_name}/core/cse")])
 
         return [b"Authentication required, redirecting.."]
+
+    @staticmethod
+    def _register_zid():
+        """
+        This operates in the flask request context. We pass in the WSGI environ into the configured auth_checker and
+        register the provided zID into the request-scoped globals.
+
+        :return: None
+        """
+
+        from flask import g, request, current_app
+
+        g.zid = current_app.config["AUTH_CHECKER"].check_auth(request.environ)
