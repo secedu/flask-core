@@ -32,6 +32,7 @@ class Config(object):
         self.NAVBAR = []
         self.SECRET_KEY = secrets.token_bytes(16)
         self.DEBUG = bool(os.environ.get("DEBUG", False))
+        self.DISABLE_AUTH = bool(os.environ.get("DISABLE_AUTH", False))
 
         # Make the auth checker pluggable - default to cse for now
         self.AUTH_CHECKER = CSEAuth()
