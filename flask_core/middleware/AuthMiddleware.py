@@ -9,7 +9,7 @@ class AuthMiddleware(object):
         self.assertion_pub_key = self.app.config["CSE_AUTH_PUBKEY"]
 
         # Register the zID into the session when
-        if self.app.config["FLASK_CORE_ENABLE_AUTH"]:        
+        if self.app.config["ENABLE_AUTH"]:
             self.app.before_request(self._register_zid)
 
     def __call__(self, environ, start_response):
@@ -20,16 +20,10 @@ class AuthMiddleware(object):
         :param start_response:
         :return:
         """
-        if not self.app.config["FLASK_CORE_ENABLE_AUTH"]:
-            return None
-        
-        if environ["PATH_INFO"] != "/core/cse" and "HTTP_COOKIE" not in environ:
-            return self._require_auth(environ, start_response)
-
-        if environ["PATH_INFO"] == "/core/cse":
+        if not self.app.config["ENABLE_AUTH"] or environ["PATH_INFO"] == "/core/cse":
             return None
 
-        if not self.app.config["AUTH_CHECKER"].check_auth(environ):
+        if "HTTP_COOKIE" not in environ or not self.app.config["AUTH_CHECKER"].check_auth(environ):
             return self._require_auth(environ, start_response)
 
         return None

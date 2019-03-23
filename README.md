@@ -6,16 +6,18 @@ This is a reusable core used to back COMP6443 applications.
 
 Flask Core is intended to be an installable Pip package to which Flask blueprints can be attached to.
 
-## Config Enviornment Variables 
+## Config Environment Variables 
 
 #### FLASK_CORE_ENABLE_AUTH
-_defaults to True_
 
-makes all users sign in to cse before proceeding
+*Default: True*
 
-#### FLASK_CORE_ISOLATION_ENABLED
-_defauls to True_
+Enforces user authentication.
 
-every user gets a isolated db, relies on FLASK_CORE_ENABLE_AUTH so is set to false if FLASK_CORE_ENABLE_AUTH is false.
+#### FLASK_CORE_ENABLE_ISOLATION
+
+*Default: True*
+
+Isolates each user's database connection. Depends on user's authentication to function.
 
 ```

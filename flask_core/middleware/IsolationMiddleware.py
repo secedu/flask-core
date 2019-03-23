@@ -15,7 +15,7 @@ class IsolationMiddleware(object):
         self.app = wsgi_app.__self__
 
         self.isolation_lib = None
-        self.isolation_tables = [t for t in os.environ.get("FLASK_CORE_ISOLATE_TABLES", "").split(",") if t.strip()]
+        self.isolation_tables = self.app.config["ISOLATION_TABLES"]
 
         type = get_database_type(os.environ["DB_CONNECTION_STRING"])
 
@@ -24,9 +24,11 @@ class IsolationMiddleware(object):
         except ModuleNotFoundError:
             self.app.logger.error(f"Couldn't import database isolation adapter {type}.{type.title()}")
 
-        self.app.config["FLASK_CORE_ISOLATION_ENABLED"] = self.isolation_lib and self.isolation_tables
+        self.app.config["ISOLATION_ENABLED"] = (
+            self.app.config["ISOLATION_ENABLED"] and self.isolation_lib and self.isolation_tables
+        )
 
-        self.app.logger.info("Database isolation %s", self.app.config["FLASK_CORE_ISOLATION_ENABLED"])
+        self.app.logger.info("Database isolation %s", self.app.config["ISOLATION_ENABLED"])
 
         # Bind our isolate method on and add our flask instance onto it
         self.app.db.isolate = partial(types.MethodType(self._isolate, self.app.db), app=self.app, db=self.app.db)
@@ -40,7 +42,7 @@ class IsolationMiddleware(object):
         :param start_response:
         :return:
         """
-        if not self.app.config["FLASK_CORE_ISOLATION_ENABLED"]:
+        if not self.app.config["ISOLATION_ENABLED"]:
             return None
 
         zid = self.app.config["AUTH_CHECKER"].check_auth(environ)
@@ -77,7 +79,7 @@ class IsolationMiddleware(object):
         conn = db.connect()
         db_type = get_database_type(app.config["DB_CONNECTION_STRING"])
 
-        if app.config["FLASK_CORE_ISOLATION_ENABLED"]:
+        if app.config["ISOLATION_ENABLED"]:
             try:
                 ns = ns or g.zid
 

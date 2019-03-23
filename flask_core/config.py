@@ -33,14 +33,11 @@ class Config(object):
         self.SECRET_KEY = secrets.token_bytes(16)
         self.DEBUG = bool(os.environ.get("DEBUG", False))
 
-        self.FLASK_CORE_ENABLE_AUTH = True
-        if os.environ.get("FLASK_CORE_ENABLE_AUTH", "").lower() == 'false':
-            self.FLASK_CORE_ENABLE_AUTH = False
+        self.ENABLE_AUTH = bool(os.environ.get("FLASK_CORE_ENABLE_AUTH", True))
+        self.ENABLE_ISOLATION = bool(os.environ.get("FLASK_CORE_ENABLE_ISOLATION", True))
 
-        if not self.FLASK_CORE_ENABLE_AUTH:
-            logger.error("Auth disabled, auto disabling database isolation")
-            self.FLASK_CORE_ISOLATION_ENABLED = False
-        
+        self.ISOLATION_TABLES = [t for t in os.environ.get("FLASK_CORE_ISOLATE_TABLES", "").split(",") if t.strip()]
+
         # Make the auth checker pluggable - default to cse for now
         self.AUTH_CHECKER = CSEAuth()
 
@@ -63,6 +60,10 @@ VQIDAQAB
         # Use any user provided config opts
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+        if not self.ENABLE_AUTH and self.ENABLE_ISOLATION:
+            logger.warning("Auth disabled, auto disabling database isolation")
+            self.ENABLE_ISOLATION = False
 
         # Try to get user specified config opts, and if they don't exist read from environment
         try:
