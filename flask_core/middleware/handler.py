@@ -3,7 +3,7 @@
 from .AuthMiddleware import AuthMiddleware
 from .FilterMiddleware import FilterMiddleware
 from .IsolationMiddleware import IsolationMiddleware
-import os 
+
 
 class Handler(object):
     def __init__(self, wsgi_app):
