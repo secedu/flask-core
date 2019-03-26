@@ -17,4 +17,8 @@ def get_database_type(uri):
     db_scheme = urllib.parse.urlparse(uri).scheme
     type = db_scheme.split("+")[0]
 
+    # Apply filters
+    if type == "postgresql":
+        type = "postgres"
+
     return type
