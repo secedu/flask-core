@@ -8,7 +8,7 @@ bp = Blueprint(
     static_folder="static",
     static_url_path="/static/core",
     url_prefix="/core",
-    template_folder='templates'
+    template_folder="templates",
 )
 
 from . import views
