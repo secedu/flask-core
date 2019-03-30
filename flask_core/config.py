@@ -68,8 +68,7 @@ VQIDAQAB
 
         # Try to get user specified config opts, and if they don't exist read from environment
         try:
-            self.FLAG_IDS = getattr(self, "FLAG_IDS", None) or os.environ["FLAG_IDS"]
-            self.FLAG_IDS = self.FLAG_IDS.split(",")
+            self.FLAG_IDS = (getattr(self, "FLAG_IDS", None) or os.environ["FLAG_IDS"]).split(",")
             self.FLAG_WRAP = getattr(self, "FLAG_WRAP", None) or os.environ["FLAG_WRAP"]
             self.FLAG_SECRET = getattr(self, "FLAG_SECRET", None) or os.environ["FLAG_SECRET"]
             self.DB_CONNECTION_STRING = (
