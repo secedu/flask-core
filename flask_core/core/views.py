@@ -30,7 +30,8 @@ from . import bp as app  # Note that app = blueprint, current_app = flask contex
 def home():
     return render_template("core/home.html")
 
-@app.route("/checker",methods=["GET","POST"])
+
+@app.route("/checker", methods=["GET", "POST"])
 def checker():
     zid = request.cookies.get("zid")
     if request.method == "POST":
@@ -39,6 +40,7 @@ def checker():
         else:
             flash("Not a flag", "danger")
     return render_template("core/check.html")
+
 
 @app.route("/cse")
 def handle_cse():

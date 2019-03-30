@@ -18,6 +18,7 @@ def gen_flag(self, zid, flag_id):
 def check_flag(self, zid, flag):
     return any((self.gen_flag(zid, f) == flag for f in self.config["FLAG_IDS"]))
 
+
 def create_app(config=None):
     """
     Creates an Flask application instance.
