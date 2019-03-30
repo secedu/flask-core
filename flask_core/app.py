@@ -6,19 +6,17 @@ from sqlalchemy import create_engine
 from .core import bp as core_bp, models as core_models
 from .middleware.handler import Handler
 import hashlib
+import types 
 
-def gen_flag(app, zid, flag_id):
-    secret = app.config["FLAG_SECRET"]
-    wrapper = app.config["FLAG_WRAP"]
+def gen_flag(self, zid, flag_id):
+    secret = self.config["FLAG_SECRET"]
+    wrapper = self.config["FLAG_WRAP"]
     s = secret+zid+str(flag_id)
     b = bytes(s,"utf-8")
     return f"{wrapper}{{{hashlib.sha256(b).hexdigest()}}}"
 
-def check_flag(app, zid, flag):
-    for flag_id in app.all_flag_ids:
-        if app.gen_flag(zid,flag_id) == flag:
-            return True
-    return False
+def check_flag(self, zid, flag):
+    return any((self.gen_flag(zid, f) == flag for f in self.config["FLAG_IDS"]))
 
 def create_app(config=None):
     """
@@ -53,7 +51,6 @@ def create_app(config=None):
     app.wsgi_app = Handler(app.wsgi_app)
 
     # Set up magic flag generator (ty closure)
-    app.all_flag_ids = app.config["FLAG_IDS"].split(",")
-    app.gen_flag = lambda zid, flag_id: gen_flag(app, zid, flag_id)
-    app.check_flag = lambda zid, flag: check_flag(app, zid, flag)
+    app.gen_flag = types.MethodType(gen_flag, app)
+    app.check_flag = types.MethodType(check_flag, app)
     return app
