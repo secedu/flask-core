@@ -28,8 +28,17 @@ from . import bp as app  # Note that app = blueprint, current_app = flask contex
 
 @app.route("/")
 def home():
-    return "Flask Core - Common routes"
+    return f"Flask Core - Common routes"
 
+@app.route("/checker",methods=["GET","POST"])
+def checker():
+    zid = request.cookies.get("zid")
+    if request.method == "POST":
+        if current_app.check_flag(zid, request.form["flag"]):
+            flash("That is a flag!", "success")
+        else:
+            flash("Not a flag", "danger")
+    return render_template("check.html")
 
 @app.route("/cse")
 def handle_cse():

@@ -1,0 +1,17 @@
+{% extends "common/base.html" %}
+{% block content %}
+<br>
+<h3>Flag Checker</h3>
+<hr>
+<p> If you found a flag on this site and are unsure if it is legit, put it here to check it</p>
+<br>
+<div class="row" style="margin-left: 0px">
+    <form method="POST">
+        <div class="form-group">
+            <label class="col-form-label col-form-label-lg" for="inputLarge">Enter Flag</label>
+            <input name="flag" class="form-control form-control-lg" type="text" placeholder="XXX{abc...}" id="inputLarge" style="width: 50vw">
+        </div>
+        <button type="submit" class="btn btn-danger">Check Flag</button>
+    </form>
+</div>
+{% endblock %}

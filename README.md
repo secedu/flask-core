@@ -14,8 +14,24 @@ TBA
 
 Flask Core accepts some configuration through environment variables.
 
-#### FLAG
+#### FLAG_IDS
+
+**Required**
+
+Comma seperated list of a id for every flag on this site, these ids can then be used with `current_app.gen_flag(zid,flag_id)` to generate a actual flag. The id is just used so you can generate the same flag in multiple places and also so the `/core/checker` site works. 
+
+#### FLAG_WRAP
+
+**Required**
+
+This is what generated flags are wrapped in, i.e if you set `FLAG_WRAP` to `BREAK1` then all flags will be in the format `BREAK1{abc...}`
+
 #### FLAG_SECRET
+
+**Required**
+
+This is the secret key which flask will use to generate flags via the `current_app.gen_flag(zid,flag_id)`
+
 #### DB_CONNECTION_STRING
 
 **Required**
