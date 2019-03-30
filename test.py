@@ -1,6 +1,7 @@
 from flask_core.app import create_app
 from flask_core.config import Config
-import os 
+import os
+
 os.environ["FLAG_IDS"] = "one,two,three"
 os.environ["FLAG_WRAP"] = "TEST_FLAG"
 os.environ["FLAG_SECRET"] = "1234_i_declare_a_thumb_war"

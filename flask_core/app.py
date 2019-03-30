@@ -7,18 +7,21 @@ from .core import bp as core_bp, models as core_models
 from .middleware.handler import Handler
 import hashlib
 
+
 def gen_flag(app, zid, flag_id):
     secret = app.config["FLAG_SECRET"]
     wrapper = app.config["FLAG_WRAP"]
-    s = secret+zid+str(flag_id)
-    b = bytes(s,"utf-8")
+    s = secret + zid + str(flag_id)
+    b = bytes(s, "utf-8")
     return f"{wrapper}{{{hashlib.sha256(b).hexdigest()}}}"
+
 
 def check_flag(app, zid, flag):
     for flag_id in app.all_flag_ids:
-        if app.gen_flag(zid,flag_id) == flag:
+        if app.gen_flag(zid, flag_id) == flag:
             return True
     return False
+
 
 def create_app(config=None):
     """
