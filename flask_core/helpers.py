@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+import json
+import textwrap
 import urllib.parse
 
 
@@ -22,3 +23,25 @@ def get_database_type(uri):
         type = "postgres"
 
     return type
+
+
+def log_request():
+    from flask import g, current_app, request
+
+    log_line = (
+        textwrap.dedent(
+            """
+        [REQUEST] {}
+    """
+        )
+        .format(
+            json.dumps(
+                dict(
+                    zid=getattr(g, "zid", "unknown user"), method=request.method, uri=request.url, payload=request.form
+                )
+            )
+        )
+        .strip("\n")
+    )
+
+    current_app.logger.info(log_line)
