@@ -28,7 +28,7 @@ from . import bp as app  # Note that app = blueprint, current_app = flask contex
 
 @app.route("/")
 def home():
-    return "Flask Core - Common routes"
+    return render_template("core/home.html")
 
 
 @app.route("/cse")
