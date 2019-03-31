@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import os
 
 from flask import Flask, g
 from sqlalchemy import create_engine
@@ -27,9 +28,10 @@ def create_app(config=None):
         app.config.from_object(config)
 
     # Bootstrap our logging under gunicorn
-    gunicorn_logger = logging.getLogger("gunicorn.error")
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+    if "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
+        gunicorn_logger = logging.getLogger("gunicorn.error")
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
 
     # Attempt to load config from pyfile as well, if it exists
     app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
