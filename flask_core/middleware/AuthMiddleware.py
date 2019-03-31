@@ -23,8 +23,8 @@ class AuthMiddleware(object):
         if not self.app.config["ENABLE_AUTH"] or environ["PATH_INFO"] == "/core/cse":
             return None
 
-        if "HTTP_COOKIE" not in environ or not self.app.config["AUTH_CHECKER"].check_auth(environ):
-            return self._require_auth(environ, start_response)
+        if not self.app.config["AUTH_CHECKER"].check_auth(environ):
+            return self.app.config["AUTH_CHECKER"].require_auth(environ,start_response)
 
         return None
 
