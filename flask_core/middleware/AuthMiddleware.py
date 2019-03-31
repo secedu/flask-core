@@ -24,7 +24,7 @@ class AuthMiddleware(object):
             return None
 
         if not self.app.config["AUTH_CHECKER"].check_auth(environ):
-            return self.app.config["AUTH_CHECKER"].require_auth(environ,start_response)
+            return self.app.config["AUTH_CHECKER"].require_auth(environ, start_response)
 
         return None
 
