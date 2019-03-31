@@ -2,7 +2,7 @@ dist:
 	python3 setup.py sdist bdist_wheel
 
 twine:
-	twine dist/*
+	twine upload dist/*
 
 dist-clean:
 	rm -rf dist/
