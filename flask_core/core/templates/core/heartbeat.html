@@ -1,0 +1,51 @@
+{% extends "common/base.html" %}
+{% block content %}
+<br>
+<h3>App Heartbeat</h3>
+<hr>
+<br>
+<p class="text-muted">Total Database Usage: {{db_use_pretty}}</p>
+<div class="progress">
+    {% if db_use <= 25 %}
+        <div class="progress-bar bg-success" role="progressbar" style="width: {{db_use}}%"></div>
+    {% elif db_use <= 50 %}
+        <div class="progress-bar bg-info" role="progressbar" style="width: {{db_use}}%"></div>
+    {% elif db_use <= 75 %}
+        <div class="progress-bar bg-warning" role="progressbar" style="width: {{db_use}}%"></div>
+    {% else %}
+        <div class="progress-bar bg-danger" role="progressbar" style="width: {{db_use}}%"></div>
+    {% endif %}
+</div>
+<br><br>
+<div style="width: 100%; display: flex; justify-content: space-around">
+    <div class="card border-info mb-3" style="width: 20rem;">
+        <div class="card-header">Flags</div>
+        <div class="card-body">
+            {% if all_flags_ok %}
+                <p class="card-text">All flags are ok</p>
+            {% else %}
+                <p class="card-text">ERROR: Some flags can not be found</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card border-info mb-3" style="width: 20rem;">
+        <div class="card-header">Uptime</div>
+        <div class="card-body">
+            <p class="card-text">App has been live for <b>{{uptime}}</b></p>
+        </div>
+    </div>
+    <div class="card border-info mb-3" style="width: 20rem;">
+        <div class="card-header">Gunicorn Health</div>
+        <div class="card-body">
+            <p class="card-text">
+                Processes: <b>{{ghealth['processes']}}</b><br>
+                Pids: <b>{{ghealth['pids']}}</b><br>
+                Memory: <br>
+                {% for k in ghealth['memory'] %}
+                <span style="margin-left: 1rem">{{k}}: <b>{{ghealth['memory'][k]}}</b></span><br>
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

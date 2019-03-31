@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from .core import bp as core_bp, models as core_models
 from .middleware.handler import Handler
 
+import time 
 
 def create_app(config=None):
     """
@@ -39,4 +40,6 @@ def create_app(config=None):
     # Register all our middleware
     app.wsgi_app = Handler(app.wsgi_app)
 
+    # When we started 
+    app.start_time = time.time()
     return app
