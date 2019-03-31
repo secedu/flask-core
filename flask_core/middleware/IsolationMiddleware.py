@@ -28,7 +28,7 @@ class IsolationMiddleware(object):
             self.app.config["ENABLE_ISOLATION"] and self.isolation_lib and self.isolation_tables
         )
 
-        self.app.logger.info("Database isolation %s", self.app.config["ISOLATION_ENABLED"])
+        self.app.logger.info("Database isolation %s", "enabled" if self.app.config["ISOLATION_ENABLED"] else "disabled")
 
         # Bind our isolate method on and add our flask instance onto it
         self.app.db.isolate = partial(types.MethodType(self._isolate, self.app), db=self.app.db)
