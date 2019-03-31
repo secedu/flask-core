@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-from http.cookies import SimpleCookie
-
 from .checker import Checker
-
 
 class ForwardedAuth(Checker):
     """
@@ -13,6 +10,6 @@ class ForwardedAuth(Checker):
     def __init__(self):
         super().__init__()
 
-
     def check_auth(self, environ):
         return environ["HTTP_X_REMOTE_USER"]
+

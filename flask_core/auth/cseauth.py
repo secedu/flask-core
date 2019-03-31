@@ -52,3 +52,4 @@ class CSEAuth(Checker):
         start_response("302 Temporary Redirect", [("Location", f"{self.cse_endpoint}?t=http://{server_name}/core/cse")])
 
         return [b"Authentication required, redirecting.."]
+
