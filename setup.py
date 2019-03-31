@@ -13,6 +13,7 @@ setup(
     description="A modular Flask core for CTF war-games, originally created for CS6443",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    url="https://github.com/secedu/flask-core",
     packages=find_packages(),
     include_package_data=True,
     install_requires=["flask", "psycopg2", "psycopg2-binary", "SQLAlchemy", "cryptography"],

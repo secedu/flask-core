@@ -1,0 +1,24 @@
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py37
+skipsdist = True
+
+[testenv]
+deps = 
+    flake8
+    flake8_formatter_junit_xml
+whitelist_externals = 
+    git
+    xargs
+    pwd
+    sh
+commands = 
+    sh -c 'mkdir -p test-reports/flake8'  # make sure the test directories exist
+    sh -c 'git diff --name-only origin/master -- "*.py" | xargs -r flake8 --tee --format junit-xml --output-file test-reports/flake8/results.xml'  # test changed files 
+"""
+
+[tool.black]
+line-length = 120
+target-version = ['py37']
+include = '\.pyi?$'
