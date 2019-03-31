@@ -28,20 +28,15 @@ def get_database_type(uri):
 def log_request():
     from flask import g, current_app, request
 
-    log_line = (
-        textwrap.dedent(
-            """
-        [REQUEST] {}
-    """
+    log_line = "[REQUEST] {}".format(
+        json.dumps(
+            {
+                "zid": getattr(g, "zid", "unknown user"),
+                "method": request.method,
+                "uri": request.url,
+                "payload": request.form,
+            }
         )
-        .format(
-            json.dumps(
-                dict(
-                    zid=getattr(g, "zid", "unknown user"), method=request.method, uri=request.url, payload=request.form
-                )
-            )
-        )
-        .strip("\n")
-    )
+    ).strip("\n")
 
     current_app.logger.info(log_line)
