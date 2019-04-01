@@ -2,12 +2,28 @@
 import logging
 import os
 
-from flask import Flask, g
+from flask import Flask
 from sqlalchemy import create_engine
 
 from flask_core.helpers import log_request
-from flask_core.core import bp as core_bp, models as core_models
+from flask_core.core import bp as core_bp
 from flask_core.middleware.handler import Handler
+
+
+def grep_flag(response):
+    from flask import g, current_app
+    if not current_app.config["AUTO_GENERATED_FLAGS"]:
+        return response
+    try:
+        data = str(response.get_data(), "utf-8")
+        zid = g.zid
+        for f in current_app.config["FLAG_IDS"]:
+            data = data.replace(f"flag{{_{f}}}", current_app.gen_flag(zid, f))
+        data = bytes(data, "utf-8")
+        response.set_data(data)
+    except Exception:
+        pass
+    return response
 
 
 def create_app(config=None):
@@ -48,7 +64,9 @@ def create_app(config=None):
     # Register all our middleware
     app.wsgi_app = Handler(app.wsgi_app)
 
+    # Set up magic flag generator (ty closure)
+    app.after_request(grep_flag)
+
     # Register our logging helper
     app.before_request(log_request)
-
     return app

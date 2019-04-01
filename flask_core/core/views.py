@@ -8,19 +8,14 @@ import secrets
 
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
 from flask import (
-    render_template_string,
     request,
     render_template,
     current_app,
     flash,
-    redirect,
-    url_for,
-    session,
     make_response,
 )
 from . import bp as app  # Note that app = blueprint, current_app = flask context
@@ -29,6 +24,17 @@ from . import bp as app  # Note that app = blueprint, current_app = flask contex
 @app.route("/")
 def home():
     return render_template("core/home.html")
+
+
+@app.route("/checker", methods=["GET", "POST"])
+def checker():
+    zid = request.cookies.get("zid")
+    if request.method == "POST":
+        if current_app.check_flag(zid, request.form["flag"]):
+            flash("That is a flag!", "success")
+        else:
+            flash("Not a flag", "danger")
+    return render_template("core/check.html")
 
 
 @app.route("/cse")
