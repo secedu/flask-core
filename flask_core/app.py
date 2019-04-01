@@ -5,12 +5,11 @@ import os
 from flask import Flask, g, request
 from sqlalchemy import create_engine
 
-
-import hashlib
-import types 
 from flask_core.helpers import log_request
 from flask_core.core import bp as core_bp, models as core_models
 from flask_core.middleware.handler import Handler
+import hashlib
+import types 
 
 def gen_flag(self, zid, flag_id):
     secret = self.config["FLAG_SECRET"]
@@ -80,5 +79,4 @@ def create_app(config=None):
     app.after_request(types.MethodType(grep_flag, app))
     # Register our logging helper
     app.before_request(log_request)
-
     return app
