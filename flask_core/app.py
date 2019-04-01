@@ -2,11 +2,11 @@
 import logging
 import os
 
-from flask import Flask, g, request
+from flask import Flask, request
 from sqlalchemy import create_engine
 
 from flask_core.helpers import log_request
-from flask_core.core import bp as core_bp, models as core_models
+from flask_core.core import bp as core_bp
 from flask_core.middleware.handler import Handler
 import hashlib
 import types
@@ -34,7 +34,7 @@ def grep_flag(self, response):
             data = data.replace(f"flag{{_{f}}}", self.gen_flag(zid, f))
         data = bytes(data, "utf-8")
         response.set_data(data)
-    except:
+    except Exception:
         pass
     return response
 
