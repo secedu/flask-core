@@ -2,36 +2,23 @@
 import logging
 import os
 
-from flask import Flask, request
+from flask import Flask
 from sqlalchemy import create_engine
 
 from flask_core.helpers import log_request
 from flask_core.core import bp as core_bp
 from flask_core.middleware.handler import Handler
-import hashlib
-import types
 
 
-def gen_flag(self, zid, flag_id):
-    secret = self.config["FLAG_SECRET"]
-    wrapper = self.config["FLAG_WRAP"]
-    s = secret + zid + str(flag_id)
-    b = bytes(s, "utf-8")
-    return f"{wrapper}{{{hashlib.sha256(b).hexdigest()}}}"
-
-
-def check_flag(self, zid, flag):
-    return any((self.gen_flag(zid, f) == flag for f in self.config["FLAG_IDS"]))
-
-
-def grep_flag(self, response):
-    if not self.config["AUTO_GENERATED_FLAGS"]:
+def grep_flag(response):
+    from flask import g, current_app
+    if not current_app.config["AUTO_GENERATED_FLAGS"]:
         return response
     try:
         data = str(response.get_data(), "utf-8")
-        zid = request.cookies["zid"]
-        for f in self.config["FLAG_IDS"]:
-            data = data.replace(f"flag{{_{f}}}", self.gen_flag(zid, f))
+        zid = g.zid
+        for f in current_app.config["FLAG_IDS"]:
+            data = data.replace(f"flag{{_{f}}}", current_app.gen_flag(zid, f))
         data = bytes(data, "utf-8")
         response.set_data(data)
     except Exception:
@@ -76,11 +63,10 @@ def create_app(config=None):
 
     # Register all our middleware
     app.wsgi_app = Handler(app.wsgi_app)
+    
     # Set up magic flag generator (ty closure)
-    app.gen_flag = types.MethodType(gen_flag, app)
-    app.check_flag = types.MethodType(check_flag, app)
-
-    app.after_request(types.MethodType(grep_flag, app))
+    app.after_request(grep_flag)
+    
     # Register our logging helper
     app.before_request(log_request)
     return app
