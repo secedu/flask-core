@@ -44,10 +44,9 @@ class CSEAuth(Checker):
         return zid
 
     def require_auth(self, environ, start_response):
-        server_name = (
-            environ["HTTP_X_FORWARDED_SERVER"] if "HTTP_X_FORWARDED_SERVER" in environ else environ["HTTP_HOST"]
-        )
+        server_name = environ["HTTP_HOST"]
+        auth_endpoint = "http://cgi.cse.unsw.edu.au/~cs6443/auth/"
 
-        start_response("302 Temporary Redirect", [("Location", f"{self.cse_endpoint}?t=http://{server_name}/core/cse")])
+        start_response("302 Temporary Redirect", [("Location", f"{auth_endpoint}?t=http://{server_name}/core/cse")])
 
         return [b"Authentication required, redirecting.."]
