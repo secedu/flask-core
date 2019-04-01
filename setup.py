@@ -7,7 +7,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="flask-core",
-    version="1.2.0",
+    version="1.3.0",
     author="Carey Li, Sean Yeoh, Zain Afzal",
     author_email="cs6443@cse.unsw.edu.au",
     description="A modular Flask core for CTF war-games, originally created for CS6443",
