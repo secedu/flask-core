@@ -61,11 +61,16 @@ VQIDAQAB
         # Use any user provided config opts
         for k, v in kwargs.items():
             setattr(self, k, v)
-
+        
+        try:
+            self.AUTO_GENERATED_FLAGS = getattr(self, "AUTO_GENERATED_FLAGS", None) or os.environ["FLASK_CORE_AUTO_GENERATED_FLAGS"]
+        except:
+            self.AUTO_GENERATED_FLAGS = True
+        
         if not self.ENABLE_AUTH and self.ENABLE_ISOLATION:
-            logger.warning("Auth disabled, auto disabling database isolation")
+            logger.warning("Auth disabled, auto disabling database isolation and auto flag generation")
             self.ENABLE_ISOLATION = False
-
+            self.AUTO_GENERATED_FLAGS = False
         # Try to get user specified config opts, and if they don't exist read from environment
         try:
             self.FLAG_IDS = (getattr(self, "FLAG_IDS", None) or os.environ["FLAG_IDS"]).split(",")

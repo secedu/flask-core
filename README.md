@@ -68,3 +68,39 @@ Enforces user authentication.
 *Default: True*
 
 Isolates each user's database connection. Depends on user's authentication to function.
+
+#### FLASK_CORE_AUTO_GENERATED_FLAGS
+
+*Default: True*
+
+Greps for flags in responses and replaces them with a user specific auto generated flag. Relies on auth. 
+
+## Flag Generation
+
+If you have auto flag generation turned on just stats all the flag_ids in the enviornment variable then you can either do 
+
+```
+current_app.gen_flag(zid,flag_id)
+```
+
+to generate a flag or actually just put the string
+
+```
+FLAG{_flagid}
+```
+
+in any response and it'll get auto grepped out and replaced with a actual flag. 
+
+i.e 
+
+```
+FLAG_IDS=xss,csrf
+```
+
+chuck in the response 
+
+```
+FLAG{_xss}
+```
+
+and it'll get replaced :)

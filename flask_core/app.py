@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, g
+from flask import Flask, g, request
 from sqlalchemy import create_engine
 
 from .core import bp as core_bp, models as core_models
@@ -18,6 +18,19 @@ def gen_flag(self, zid, flag_id):
 def check_flag(self, zid, flag):
     return any((self.gen_flag(zid, f) == flag for f in self.config["FLAG_IDS"]))
 
+def grep_flag(self, response):
+    if not self.config["AUTO_GENERATED_FLAGS"]:
+        return response
+    try:        
+        data = str(response.get_data(),"utf-8")
+        zid = request.cookies["zid"]
+        for f in self.config["FLAG_IDS"]:
+            data = data.replace(f"flag{{_{f}}}",self.gen_flag(zid,f))
+        data = bytes(data,"utf-8")
+        response.set_data(data)
+    except:
+        pass
+    return response
 
 def create_app(config=None):
     """
@@ -50,8 +63,9 @@ def create_app(config=None):
 
     # Register all our middleware
     app.wsgi_app = Handler(app.wsgi_app)
-
     # Set up magic flag generator (ty closure)
     app.gen_flag = types.MethodType(gen_flag, app)
     app.check_flag = types.MethodType(check_flag, app)
+
+    app.after_request(types.MethodType(grep_flag, app))
     return app

@@ -41,7 +41,6 @@ def checker():
             flash("Not a flag", "danger")
     return render_template("core/check.html")
 
-
 @app.route("/cse")
 def handle_cse():
     """
