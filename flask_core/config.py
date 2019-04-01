@@ -66,7 +66,7 @@ VQIDAQAB
             self.AUTO_GENERATED_FLAGS = (
                 getattr(self, "AUTO_GENERATED_FLAGS", None) or os.environ["FLASK_CORE_AUTO_GENERATED_FLAGS"]
             )
-        except:
+        except KeyError as e:
             self.AUTO_GENERATED_FLAGS = True
 
         if not self.ENABLE_AUTH and self.ENABLE_ISOLATION:
