@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
+import logging
+import os
 
 from flask import Flask, g, request
 from sqlalchemy import create_engine
 
-from .core import bp as core_bp, models as core_models
-from .middleware.handler import Handler
+
 import hashlib
 import types 
+from flask_core.helpers import log_request
+from flask_core.core import bp as core_bp, models as core_models
+from flask_core.middleware.handler import Handler
 
 def gen_flag(self, zid, flag_id):
     secret = self.config["FLAG_SECRET"]
@@ -49,6 +53,12 @@ def create_app(config=None):
     if config:
         app.config.from_object(config)
 
+    # Bootstrap our logging under gunicorn
+    if "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
+        gunicorn_logger = logging.getLogger("gunicorn.error")
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+
     # Attempt to load config from pyfile as well, if it exists
     app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
 
@@ -68,4 +78,7 @@ def create_app(config=None):
     app.check_flag = types.MethodType(check_flag, app)
 
     app.after_request(types.MethodType(grep_flag, app))
+    # Register our logging helper
+    app.before_request(log_request)
+
     return app

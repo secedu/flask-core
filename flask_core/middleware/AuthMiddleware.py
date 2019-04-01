@@ -23,8 +23,8 @@ class AuthMiddleware(object):
         if not self.app.config["ENABLE_AUTH"] or environ["PATH_INFO"] == "/core/cse":
             return None
 
-        if "HTTP_COOKIE" not in environ or not self.app.config["AUTH_CHECKER"].check_auth(environ):
-            return self._require_auth(environ, start_response)
+        if not self.app.config["AUTH_CHECKER"].check_auth(environ):
+            return self.app.config["AUTH_CHECKER"].require_auth(environ, start_response)
 
         return None
 
@@ -39,9 +39,7 @@ class AuthMiddleware(object):
         :param start_response:
         :return:
         """
-        server_name = (
-            environ["HTTP_X_FORWARDED_SERVER"] if "HTTP_X_FORWARDED_SERVER" in environ else environ["HTTP_HOST"]
-        )
+        server_name = environ["HTTP_HOST"]
 
         start_response("302 Temporary Redirect", [("Location", f"{self.cse_endpoint}?t=http://{server_name}/core/cse")])
 

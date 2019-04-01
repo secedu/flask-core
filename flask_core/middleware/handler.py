@@ -3,6 +3,7 @@
 from .AuthMiddleware import AuthMiddleware
 from .FilterMiddleware import FilterMiddleware
 from .IsolationMiddleware import IsolationMiddleware
+from .ReverseProxyMiddleware import ReverseProxyMiddleware
 
 
 class Handler(object):
@@ -10,6 +11,7 @@ class Handler(object):
         self.wsgi_app = wsgi_app
         self.middleware = [
             FilterMiddleware(self.wsgi_app),
+            ReverseProxyMiddleware(self.wsgi_app),
             AuthMiddleware(self.wsgi_app),
             IsolationMiddleware(self.wsgi_app),
         ]
