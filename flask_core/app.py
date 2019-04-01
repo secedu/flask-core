@@ -9,31 +9,35 @@ from flask_core.helpers import log_request
 from flask_core.core import bp as core_bp, models as core_models
 from flask_core.middleware.handler import Handler
 import hashlib
-import types 
+import types
+
 
 def gen_flag(self, zid, flag_id):
     secret = self.config["FLAG_SECRET"]
     wrapper = self.config["FLAG_WRAP"]
-    s = secret+zid+str(flag_id)
-    b = bytes(s,"utf-8")
+    s = secret + zid + str(flag_id)
+    b = bytes(s, "utf-8")
     return f"{wrapper}{{{hashlib.sha256(b).hexdigest()}}}"
+
 
 def check_flag(self, zid, flag):
     return any((self.gen_flag(zid, f) == flag for f in self.config["FLAG_IDS"]))
 
+
 def grep_flag(self, response):
     if not self.config["AUTO_GENERATED_FLAGS"]:
         return response
-    try:        
-        data = str(response.get_data(),"utf-8")
+    try:
+        data = str(response.get_data(), "utf-8")
         zid = request.cookies["zid"]
         for f in self.config["FLAG_IDS"]:
-            data = data.replace(f"flag{{_{f}}}",self.gen_flag(zid,f))
-        data = bytes(data,"utf-8")
+            data = data.replace(f"flag{{_{f}}}", self.gen_flag(zid, f))
+        data = bytes(data, "utf-8")
         response.set_data(data)
     except:
         pass
     return response
+
 
 def create_app(config=None):
     """
