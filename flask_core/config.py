@@ -61,7 +61,7 @@ VQIDAQAB
         # Use any user provided config opts
         for k, v in kwargs.items():
             setattr(self, k, v)
-        
+
         self.AUTO_GENERATED_FLAGS = (
             getattr(self, "AUTO_GENERATED_FLAGS", None) or os.environ.get("FLASK_CORE_AUTO_GENERATED_FLAGS", True)
         )

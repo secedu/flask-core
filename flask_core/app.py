@@ -63,10 +63,10 @@ def create_app(config=None):
 
     # Register all our middleware
     app.wsgi_app = Handler(app.wsgi_app)
-    
+
     # Set up magic flag generator (ty closure)
     app.after_request(grep_flag)
-    
+
     # Register our logging helper
     app.before_request(log_request)
     return app
