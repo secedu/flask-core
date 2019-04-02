@@ -8,21 +8,21 @@ from sqlalchemy import create_engine
 from flask_core.helpers import log_request
 from flask_core.core import bp as core_bp
 from flask_core.middleware.handler import Handler
+from flask_core.flag import gen_flag
 
 
 def grep_flag(response):
     from flask import g, current_app
     if not current_app.config["AUTO_GENERATED_FLAGS"]:
         return response
-    try:
-        data = str(response.get_data(), "utf-8")
-        zid = g.zid
-        for f in current_app.config["FLAG_IDS"]:
-            data = data.replace(f"flag{{_{f}}}", current_app.gen_flag(zid, f))
-        data = bytes(data, "utf-8")
-        response.set_data(data)
-    except Exception:
-        pass
+    response.direct_passthrough = False
+    data = str(response.get_data(), "utf-8")
+    zid = g.zid
+    for f in current_app.config["FLAG_IDS"]:
+        data = data.replace(f"flag{{_{f}}}", gen_flag(zid, f))
+    data = bytes(data, "utf-8")
+    response.set_data(data)
+
     return response
 
 

@@ -5,6 +5,8 @@ def gen_flag(zid, flag_id):
     from flask import current_app
     secret = current_app.config["FLAG_SECRET"]
     wrapper = current_app.config["FLAG_WRAP"]
+    if not zid:
+        return "FLAG{TEST_FLAG_ALWAYS_REPLACE}"
     s = secret + zid + str(flag_id)
     b = bytes(s, "utf-8")
     return f"{wrapper}{{{hashlib.sha256(b).hexdigest()}}}"
