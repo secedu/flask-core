@@ -40,6 +40,9 @@ def create_app(config=None):
     """
     app = Flask(__name__)
 
+    # Attempt to load config from pyfile as well, if it exists
+    app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
+
     if config:
         app.config.from_object(config)
 
@@ -48,9 +51,6 @@ def create_app(config=None):
         gunicorn_logger = logging.getLogger("gunicorn.error")
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
-
-    # Attempt to load config from pyfile as well, if it exists
-    app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
 
     # setup our database connection
     if "DB_CONNECTION_STRING" in app.config:
