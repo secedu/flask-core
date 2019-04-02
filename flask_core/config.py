@@ -5,18 +5,20 @@ import secrets
 import logging
 import textwrap
 
+import flask
+
 from flask_core.auth.cseauth import CSEAuth
 from distutils.util import strtobool
 
 logger = logging.getLogger(__name__)
 
 
-class Config(object):
+class Config(flask.config.Config):
     """
     Core config for our application.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, root_path=None, **kwargs):
         """
         Create the configuration object.
 
@@ -24,6 +26,9 @@ class Config(object):
 
         :param kwargs: Options to set
         """
+        root_path = root_path or os.getcwd()
+
+        super().__init__(root_path=root_path)
 
         # Sensible defaults
         self.STATIC_URL_PATH = "/static"
@@ -62,14 +67,16 @@ VQIDAQAB
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        self.AUTO_GENERATED_FLAGS = (
-            getattr(self, "AUTO_GENERATED_FLAGS", None) or os.environ.get("FLASK_CORE_AUTO_GENERATED_FLAGS", True)
+        self.AUTO_GENERATED_FLAGS = getattr(self, "AUTO_GENERATED_FLAGS", None) or os.environ.get(
+            "FLASK_CORE_AUTO_GENERATED_FLAGS", True
         )
 
         if not self.ENABLE_AUTH and self.ENABLE_ISOLATION:
             logger.warning("Auth disabled, auto disabling database isolation and auto flag generation")
+
             self.ENABLE_ISOLATION = False
             self.AUTO_GENERATED_FLAGS = False
+
         # Try to get user specified config opts, and if they don't exist read from environment
         try:
             self.FLAG_IDS = (getattr(self, "FLAG_IDS", None) or os.environ["FLAG_IDS"]).split(",")

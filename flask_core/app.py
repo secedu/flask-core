@@ -13,6 +13,7 @@ from flask_core.flag import gen_flag
 
 def grep_flag(response):
     from flask import g, current_app
+
     if not current_app.config["AUTO_GENERATED_FLAGS"]:
         return response
     response.direct_passthrough = False
@@ -40,11 +41,14 @@ def create_app(config=None):
     """
     app = Flask(__name__)
 
-    # Attempt to load config from pyfile as well, if it exists
-    app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
+    if config is None:
+        config = app.config
 
-    if config:
-        app.config.from_object(config)
+    # Attempt to load config from pyfile as well, if it exists
+    config.from_envvar("FLASK_CORE_CONFIG", silent=True)
+
+    # Load our config options into flask
+    app.config.from_object(config)
 
     # Bootstrap our logging under gunicorn
     if "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
@@ -69,4 +73,5 @@ def create_app(config=None):
 
     # Register our logging helper
     app.before_request(log_request)
+
     return app
