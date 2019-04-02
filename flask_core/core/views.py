@@ -11,19 +11,15 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from flask import (
-    request,
-    render_template,
-    current_app,
-    flash,
-    make_response,
-)
+from flask import request, render_template, current_app, flash, make_response
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 from flask_core.flag import check_flag
+
 
 @app.route("/")
 def home():
     return render_template("core/home.html")
+
 
 @app.route("/checker", methods=["GET", "POST"])
 def checker():
