@@ -92,7 +92,7 @@ VQIDAQAB
         )
 
     def validate(self):
-        required = ["FLAG_IDS", "FLAG_WRAP", "FLAG_SECRET", "DB_CONNECTION_STRING"]
+        required = ["FLAG_IDS", "FLAG_WRAP", "FLAG_SECRET"]
 
         # Validate each required field is in the config. We need to check both attributes and other things
         for field in required:
