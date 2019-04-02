@@ -8,22 +8,7 @@ from sqlalchemy import create_engine
 from flask_core.helpers import log_request
 from flask_core.core import bp as core_bp
 from flask_core.middleware.handler import Handler
-from flask_core.flag import gen_flag
-
-
-def grep_flag(response):
-    from flask import g, current_app
-    if not current_app.config["AUTO_GENERATED_FLAGS"]:
-        return response
-    response.direct_passthrough = False
-    data = str(response.get_data(), "utf-8")
-    zid = g.zid
-    for f in current_app.config["FLAG_IDS"]:
-        data = data.replace(f"flag{{_{f}}}", gen_flag(zid, f))
-    data = bytes(data, "utf-8")
-    response.set_data(data)
-
-    return response
+from flask_core.flag import grep_flag
 
 
 def create_app(config=None):
@@ -40,11 +25,18 @@ def create_app(config=None):
     """
     app = Flask(__name__)
 
-    # Attempt to load config from pyfile as well, if it exists
-    app.config.from_envvar("FLASK_CORE_CONFIG", silent=True)
+    if config is None:
+        config = app.config
 
-    if config:
-        app.config.from_object(config)
+    # Attempt to load config from pyfile as well, if it exists
+    config.from_envvar("FLASK_CORE_CONFIG", silent=True)
+
+    # Validate our config
+    if "validate" in dir(config):
+        config.validate()
+
+    # Load our config options into flask
+    app.config.from_object(config)
 
     # Bootstrap our logging under gunicorn
     if "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
@@ -52,10 +44,17 @@ def create_app(config=None):
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
 
+    # Log out our config so its visible
+    app.logger.info("Running configuration:")
+    for k, v in app.config.items():
+        app.logger.info("\t%s -> %s", k, v)
+
     # setup our database connection
-    if "DB_CONNECTION_STRING" in app.config:
+    app.db = None
+    if "DB_CONNECTION_STRING" in app.config and app.config["DB_CONNECTION_STRING"] is not None:
         app.db = create_engine(
-            app.config["DB_CONNECTION_STRING"], pool_pre_ping=app.config.get("DB_AUTO_RECONNECT", True)
+            app.config["DB_CONNECTION_STRING"],
+            pool_pre_ping=app.config.get("DB_AUTO_RECONNECT", True)
         )
 
     # Register core blueprints
@@ -64,9 +63,10 @@ def create_app(config=None):
     # Register all our middleware
     app.wsgi_app = Handler(app.wsgi_app)
 
-    # Set up magic flag generator (ty closure)
+    # Set up magic flag generator
     app.after_request(grep_flag)
 
     # Register our logging helper
     app.before_request(log_request)
+
     return app
