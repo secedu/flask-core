@@ -19,18 +19,17 @@ from flask import (
     make_response,
 )
 from . import bp as app  # Note that app = blueprint, current_app = flask context
-
+from flask_core.flag import check_flag
 
 @app.route("/")
 def home():
     return render_template("core/home.html")
 
-
 @app.route("/checker", methods=["GET", "POST"])
 def checker():
     zid = request.cookies.get("zid")
     if request.method == "POST":
-        if current_app.check_flag(zid, request.form["flag"]):
+        if check_flag(zid, request.form["flag"]):
             flash("That is a flag!", "success")
         else:
             flash("Not a flag", "danger")
