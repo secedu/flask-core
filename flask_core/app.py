@@ -53,8 +53,7 @@ def create_app(config=None):
     app.db = None
     if "DB_CONNECTION_STRING" in app.config and app.config["DB_CONNECTION_STRING"] is not None:
         app.db = create_engine(
-            app.config["DB_CONNECTION_STRING"],
-            pool_pre_ping=app.config.get("DB_AUTO_RECONNECT", True)
+            app.config["DB_CONNECTION_STRING"], pool_pre_ping=app.config.get("DB_AUTO_RECONNECT", True)
         )
 
     # Register core blueprints
