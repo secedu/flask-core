@@ -11,7 +11,9 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from flask import request, render_template, current_app, flash, make_response
+from flask import request, render_template, current_app, flash, make_response, g
+
+from flask_core.auth.cseauth import CSEAuth
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 from flask_core.flag import check_flag
 
@@ -23,12 +25,18 @@ def home():
 
 @app.route("/checker", methods=["GET", "POST"])
 def checker():
-    zid = request.cookies.get("zid")
+    if g.zid is None:
+        tag = secrets.token_hex(10)
+        current_app.logger.error("[%s] Failed to get zID for request, g.zid is None.", tag)
+
+        return "Report this to #comp6443-problems with this tag: %s" % tag
+
     if request.method == "POST":
-        if check_flag(zid, request.form["flag"]):
+        if check_flag(g.zid, request.form["flag"]):
             flash("That is a flag!", "success")
         else:
             flash("Not a flag", "danger")
+
     return render_template("core/check.html")
 
 
@@ -42,6 +50,10 @@ def handle_cse():
 
     :return:
     """
+
+    # Check if we're using the CSE auth checker
+    if type(current_app.config.AUTH_CHECKER) is not CSEAuth:
+        return "This incident has been reported.", 403
 
     if any((x for x in ["a", "s"] if x not in request.args)):
         return "Invalid authorization request.", 400
