@@ -1,1 +1,2 @@
 recursive-include flask_core/templates *
+recursive-include flask_core/core/templates *
