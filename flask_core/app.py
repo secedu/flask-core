@@ -41,8 +41,7 @@ def create_app(config=None):
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             !!!!!!   FLASK CORE CONFIG DEFINED BUT DOESN'T EXIST   !!!!!!
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            
-            FLASK_CORE_CONFIG = %s 
+            FLASK_CORE_CONFIG = %s
         """
                 % (os.environ["FLASK_CORE_CONFIG"])
             ),
