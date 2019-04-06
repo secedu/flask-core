@@ -23,6 +23,19 @@ def home():
     return render_template("core/home.html")
 
 
+@app.route("/wipedb", methods=["GET", "POST"])
+def wipe():
+    if request.method == "POST":
+        try:
+            current_app.db.execute(f"DROP SCHEMA {g.zid} CASCADE")
+
+            flash("DB Wiped.", "success")
+        except ValueError:
+            flash("Something Went Wrong :(", "danger")
+
+    return render_template("core/wipedb.html")
+
+
 @app.route("/checker", methods=["GET", "POST"])
 def checker():
     if g.zid is None:

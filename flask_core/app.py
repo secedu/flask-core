@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import logging
 import os
+import sys
+import textwrap
 
 from flask import Flask
 from sqlalchemy import create_engine
@@ -30,6 +32,21 @@ def create_app(config=None):
 
     # Attempt to load config from pyfile as well, if it exists
     config.from_envvar("FLASK_CORE_CONFIG", silent=True)
+
+    # Complain about the config.py not existing if its defined
+    if "FLASK_CORE_CONFIG" in os.environ and not os.path.isfile(os.environ["FLASK_CORE_CONFIG"]):
+        print(
+            textwrap.dedent(
+                """
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            !!!!!!   FLASK CORE CONFIG DEFINED BUT DOESN'T EXIST   !!!!!!
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            FLASK_CORE_CONFIG = %s
+        """
+                % (os.environ["FLASK_CORE_CONFIG"])
+            ),
+            file=sys.stderr,
+        )
 
     # Validate our config
     if "validate" in dir(config):
