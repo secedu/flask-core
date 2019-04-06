@@ -16,7 +16,6 @@ from flask import request, render_template, current_app, flash, make_response, g
 from flask_core.auth.cseauth import CSEAuth
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 from flask_core.flag import check_flag
-from sqlalchemy.exc import SQLAlchemyError
 
 
 @app.route("/")
