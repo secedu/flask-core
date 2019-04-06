@@ -16,11 +16,23 @@ from flask import request, render_template, current_app, flash, make_response, g
 from flask_core.auth.cseauth import CSEAuth
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 from flask_core.flag import check_flag
+from sqlalchemy.exc import SQLAlchemyError
 
 
 @app.route("/")
 def home():
     return render_template("core/home.html")
+
+
+@app.route("/wipedb")
+def wipe():
+    if request.method == "POST":
+        try:
+            current_app.db.execute("DROP SCHEMA {g.zid}")
+            flash("DB Wiped.", "success")
+        except SQLAlchemyError:
+            flash("Something Went Wrong :(", "danger")
+    return render_template("core/wipedb.html")
 
 
 @app.route("/checker", methods=["GET", "POST"])

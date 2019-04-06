@@ -7,7 +7,7 @@ import textwrap
 
 import flask
 
-from flask_core.auth.cseauth import CSEAuth
+from flask_core.auth.forwardedauth import ForwardedAuth
 from distutils.util import strtobool
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ class Config(flask.config.Config):
         self.ISOLATION_TABLES = [t for t in os.environ.get("FLASK_CORE_ISOLATE_TABLES", "").split(",") if t.strip()]
 
         # Make the auth checker pluggable - default to cse for now
-        self.AUTH_CHECKER = CSEAuth()
+        self.AUTH_CHECKER = ForwardedAuth()
 
         # CSE auth verification stuff
         self.CSE_AUTH_ENDPOINT = "http://cgi.cse.unsw.edu.au/~cs6443/auth/"
