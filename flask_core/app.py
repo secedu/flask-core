@@ -43,7 +43,7 @@ def create_app(config=None):
         gunicorn_logger = logging.getLogger("gunicorn.error")
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
-    
+
     # Log out our config so its visible
     app.logger.info("Running configuration:")
     for k, v in app.config.items():
