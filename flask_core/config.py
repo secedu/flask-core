@@ -68,6 +68,7 @@ VQIDAQAB
 
         # Use any user provided config opts
         for k, v in kwargs.items():
+            logger.info(f"Reading config from kwards {k} => {v}")
             setattr(self, k, v)
 
         self.AUTO_GENERATED_FLAGS = getattr(self, "AUTO_GENERATED_FLAGS", None) or os.environ.get(

@@ -24,13 +24,13 @@ def home():
     return render_template("core/home.html")
 
 
-@app.route("/wipedb")
+@app.route("/wipedb", methods=["GET", "POST"])
 def wipe():
     if request.method == "POST":
         try:
-            current_app.db.execute("DROP SCHEMA {g.zid}")
+            current_app.db.execute(f"DROP SCHEMA {g.zid}")
             flash("DB Wiped.", "success")
-        except SQLAlchemyError:
+        except ValueError:
             flash("Something Went Wrong :(", "danger")
     return render_template("core/wipedb.html")
 
