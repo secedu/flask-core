@@ -17,7 +17,7 @@ class IsolationMiddleware(object):
         self.isolation_lib = None
         self.isolation_tables = self.app.config["ISOLATION_TABLES"]
 
-        type = get_database_type(os.environ["DB_CONNECTION_STRING"])
+        type = get_database_type(self.app.config["DB_CONNECTION_STRING"])
 
         try:
             self.isolation_lib = getattr(importlib.import_module(f"flask_core.database.{type}"), type.title())(self.app)
