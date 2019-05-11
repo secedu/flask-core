@@ -7,9 +7,10 @@ class FilterMiddleware(object):
         self.blacklist = ["sqlmap", "dirbuster"]
 
     def __call__(self, environ, start_response):
-        if any((x for x in self.blacklist if x in environ["HTTP_USER_AGENT"].lower())):
-            start_response("503 Internal Server Error", [])
-
-            return [b"Something went wrong."]
-
+        try:
+            if any((x for x in self.blacklist if x in environ["HTTP_USER_AGENT"].lower())):
+                start_response("503 Internal Server Error", [])
+                return [b"Something went wrong."]
+        except KeyError:
+            pass
         return None
