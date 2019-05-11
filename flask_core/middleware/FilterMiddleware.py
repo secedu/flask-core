@@ -14,3 +14,4 @@ class FilterMiddleware(object):
         except KeyError:
             pass
         return None
+        
